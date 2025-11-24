@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Aplicar descuento al Pedido #{{ pedido.id }}</h2>
+
+<p><strong>Cliente:</strong> {{ pedido.cliente.nombre }}</p>
+<p><strong>Total actual:</strong> Bs. {{ pedido.total }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="id_descuento" class="form-label">Selecciona un descuento:</label>
+    <select name="descuento_id" id="id_descuento" class="form-select">
+      <option value="">-- Seleccionar --</option>
+      {% for d in descuentos %}
+        <option value="{{ d.id }}">
+          {{ d.nombre }} 
+          ({% if d.tipo == "PORCENTAJE" %}{{ d.valor }}%{% else %}Bs. {{ d.valor }}{% endif %})
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Aplicar descuento</button>
+  <a href="{% url 'pedido_detalle' pedido.id %}" class="btn btn-secondary">Volver</a>
+</form>
+{% endblock %}

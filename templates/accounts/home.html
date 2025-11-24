@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- HERO PRINCIPAL -->
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-10">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-light">
+      <div class="row g-4 align-items-center">
+
+        <!-- Imagen -->
+        <div class="col-md-5 text-center">
+          <img src="{% static 'images/home_postres.jpg' %}" 
+              alt="Postres Dulce Bocatto"
+              class="img-fluid rounded-3">
+        </div>
+
+        <!-- Texto principal -->
+        <div class="col-md-7">
+          <h1 class="mb-3" style="color: var(--cafe); font-weight: 800;">
+            Bienvenido a Dulce Bocatto
+          </h1>
+          <p class="text-muted mb-3">
+            Administra fácilmente el catálogo, los pedidos de tus clientes
+            y las compras a proveedores desde un solo lugar.
+          </p>
+
+          <ul class="text-muted mb-4">
+            <li>💗 Catálogo de postres siempre disponible para tus clientes.</li>
+            <li>📦 Seguimiento de pedidos, entregas y calificaciones.</li>
+            <li>📊 Reportes diarios para controlar ventas y producción.</li>
+          </ul>
+
+          <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'catalogo' %}" class="btn btn-primary btn-lg">
+              Ver catálogo
+            </a>
+            <a href="{% url 'pedidos_confirmados' %}" class="btn btn-outline-secondary btn-lg">
+              Mis pedidos
+            </a>
+            <a href="{% url 'perfil' %}" class="btn btn-outline-secondary btn-lg">
+              Mi perfil
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TARJETAS RESUMEN / ACCESOS RÁPIDOS -->
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-10">
+    <div class="row g-3">
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <h5 class="card-title" style="color: var(--cafe);">Pedidos y clientes</h5>
+            <p class="card-text text-muted">
+              Revisa el historial de pedidos, detalles de facturas y calificaciones
+              de tus clientes.
+            </p>
+            <a href="{% url 'historial_clientes' %}" class="btn btn-sm btn-primary">
+              Ver historial de pedidos
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <h5 class="card-title" style="color: var(--cafe);">Compras y proveedores</h5>
+            <p class="card-text text-muted">
+              Gestiona las compras de insumos y controla a tus proveedores
+              desde el sistema.
+            </p>
+            <a href="{% url 'compras_list' %}" class="btn btn-sm btn-primary">
+              Ver compras
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <h5 class="card-title" style="color: var(--cafe);">Reportes rápidos</h5>
+            <p class="card-text text-muted">
+              Consulta ventas diarias, reportes de ventas y pedidos para producción
+              para tomar decisiones.
+            </p>
+            <a href="{% url 'ventas_diarias' %}" class="btn btn-sm btn-primary me-1 mb-1">
+              Ventas diarias
+            </a>
+            <a href="{% url 'pedidos_para_produccion' %}" class="btn btn-sm btn-outline-secondary mb-1">
+              Producción
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

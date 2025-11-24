@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Pedidos listos para gestionar envío</h2>
+
+  {% if rows %}
+    <table class="table table-sm align-middle mt-3">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Método</th>
+          <th>Dirección</th>
+          <th>Total</th>
+          <th>Pagado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td>#{{ r.id }}</td>
+          <td>{{ r.cliente }}</td>
+          <td>{{ r.metodo_envio }}</td>
+          <td>{{ r.direccion_entrega|default:"—" }}</td>
+          <td>Bs. {{ r.total }}</td>
+          <td>Bs. {{ r.pagado }}</td>
+          <td>
+            <a class="btn btn-primary btn-sm" href="{% url 'envio_crear_editar' r.id %}">Gestionar</a>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info mt-3">No hay pedidos listos para envío.</div>
+  {% endif %}
+
+  <a href="{% url 'pedidos_confirmados' %}" class="btn btn-secondary mt-2">Volver</a>
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid py-2">
+
+  <!-- TÍTULO -->
+  <div class="d-flex align-items-center justify-content-between">
+    <h2 class="mt-2 mb-3">Historial de entregas</h2>
+  </div>
+
+  <!-- ===========================
+       FORMULARIO DE FILTROS (GET)
+       =========================== -->
+  <form class="row g-2 align-items-end mb-3" method="get">
+    <div class="col-md-4">
+      <label class="form-label">Buscar</label>
+      <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Repartidor o cliente">
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Estado</label>
+      <select class="form-select" name="estado">
+        <option value="">-- Todos --</option>
+        {% for e in ESTADOS %}
+          <option value="{{ e }}" {% if estado == e %}selected{% endif %}>{{ e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Desde</label>
+      <input class="form-control" type="date" name="d1" value="{{ d1 }}">
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Hasta</label>
+      <input class="form-control" type="date" name="d2" value="{{ d2 }}">
+    </div>
+
+    <div class="col-md-1 d-grid">
+      <button class="btn btn-primary">Filtrar</button>
+    </div>
+
+    <input type="hidden" name="sort" value="{{ sort }}">
+    <input type="hidden" name="dir" value="{{ dir }}">
+  </form>
+
+  <!-- ===========================
+       BOTONES DE EXPORTACIÓN
+       =========================== -->
+  <div class="d-flex justify-content-end mb-3 gap-2">
+    <a class="btn btn-outline-secondary btn-sm"
+       href="{% url 'historial_entregas_csv' %}?q={{ q }}&estado={{ estado }}&d1={{ d1 }}&d2={{ d2 }}&sort={{ sort }}&dir={{ dir }}">
+      📄 Exportar CSV
+    </a>
+
+    <a class="btn btn-outline-secondary btn-sm"
+       href="{% url 'historial_entregas_html' %}?q={{ q }}&estado={{ estado }}&d1={{ d1 }}&d2={{ d2 }}&sort={{ sort }}&dir={{ dir }}">
+      🌐 Exportar HTML
+    </a>
+
+    <a class="btn btn-outline-secondary btn-sm"
+       href="{% url 'historial_entregas_pdf' %}?q={{ q }}&estado={{ estado }}&d1={{ d1 }}&d2={{ d2 }}&sort={{ sort }}&dir={{ dir }}">
+      🧾 Exportar PDF
+    </a>
+  </div>
+
+  <!-- ===========================
+       KPIs / RESUMEN
+       =========================== -->
+  <div class="small text-muted mb-2">
+    Entregas: <b>{{ total_envios }}</b>
+    &nbsp;|&nbsp;
+    Entregadas: <b>{{ total_entregados }}</b>
+  </div>
+
+  <!-- ===========================
+       TABLA ORDENABLE
+       =========================== -->
+  <div class="table-responsive">
+    <table class="table table-sm align-middle">
+      <thead>
+        <tr>
+          <th class="text-nowrap">
+            <a href="?q={{ q }}&estado={{ estado }}&d1={{ d1 }}&d2={{ d2 }}&sort=fecha&dir={{ next_dir_fecha }}">
+              Fecha
+              {% if sort == "fecha" %}
+                <small class="text-muted">({{ dir|upper }})</small>
+              {% endif %}
+            </a>
+          </th>
+
+          <th class="text-nowrap">
+            <a href="?q={{ q }}&estado={{ estado }}&d1={{ d1 }}&d2={{ d2 }}&sort=repartidor&dir={{ next_dir_rep }}">
+              Repartidor
+              {% if sort == "repartidor" %}
+                <small class="text-muted">({{ dir|upper }})</small>
+              {% endif %}
+            </a>
+          </th>
+
+          <th class="text-nowrap">
+            <a href="?q={{ q }}&estado={{ estado }}&d1={{ d1 }}&d2={{ d2 }}&sort=cliente&dir={{ next_dir_cli }}">
+              Cliente
+              {% if sort == "cliente" %}
+                <small class="text-muted">({{ dir|upper }})</small>
+              {% endif %}
+            </a>
+          </th>
+
+          <th class="text-nowrap">Pedido</th>
+
+          <th class="text-nowrap">
+            <a href="?q={{ q }}&estado={{ estado }}&d1={{ d1 }}&d2={{ d2 }}&sort=estado&dir={{ next_dir_est }}">
+              Estado
+              {% if sort == "estado" %}
+                <small class="text-muted">({{ dir|upper }})</small>
+              {% endif %}
+            </a>
+          </th>
+
+          <th class="text-nowrap">Método envío</th>
+          <th class="text-nowrap">Dirección</th>
+          <th class="text-nowrap">Total</th>
+          <th class="text-nowrap">Calificación / Comentario</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td>{{ r.fecha }}</td>
+            <td>{{ r.repartidor }}</td>
+            <td>{{ r.cliente }}</td>
+            <td>{{ r.pedido_id }}</td>
+
+            <td>
+              {% with est=r.estado|upper %}
+                {% if est == "ENTREGADO" %}
+                  <span class="badge text-bg-success">{{ r.estado }}</span>
+                {% elif est == "EN_CAMINO" %}
+                  <span class="badge text-bg-warning">{{ r.estado }}</span>
+                {% elif est == "PENDIENTE" %}
+                  <span class="badge text-bg-secondary">{{ r.estado }}</span>
+                {% elif est == "CANCELADO" %}
+                  <span class="badge text-bg-danger">{{ r.estado }}</span>
+                {% else %}
+                  <span class="badge text-bg-light">{{ r.estado }}</span>
+                {% endif %}
+              {% endwith %}
+            </td>
+
+            <td>{{ r.metodo_envio }}</td>
+            <td>{{ r.direccion }}</td>
+            <td>{{ r.total }}</td>
+
+            <!-- COLUMNA DE CALIFICACIÓN (SOLO LECTURA PARA EL ADMIN) -->
+            <td>
+              {% if r.comentario %}
+                  <span class="badge text-bg-success">Calificado</span><br>
+                  <small>{{ r.comentario }}</small>
+              {% else %}
+                  <span class="text-muted">Sin calificación</span>
+              {% endif %}
+            </td>
+
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+              Sin entregas para los filtros seleccionados.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}

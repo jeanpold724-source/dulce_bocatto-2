@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Pedido #{{ pedido.id }}</h2>
+
+<p class="mb-2">
+  Estado: <b>{{ pedido.estado }}</b> —
+  Total: <b>{{ pedido.total|floatformat:2 }} Bs.</b>
+</p>
+
+{% if puede_editar %}
+  <a class="btn btn-outline-secondary btn-sm float-end"
+     href="{% url 'pedido_editar' pedido.id %}">
+    ✏️ Editar pedido
+  </a>
+{% endif %}
+
+<p class="mb-3">
+  Cliente:
+  <b>
+    {% if pedido.cliente %}
+      {{ pedido.cliente.nombre|default:pedido.cliente }}
+    {% else %}
+      —
+    {% endif %}
+  </b>
+</p>
+
+{% if puede_editar %}
+  <a class="btn btn-warning btn-sm mb-2" href="{% url 'pedido_editar' pedido.id %}">
+    Editar detalle
+  </a>
+{% endif %}
+
+<hr>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Sabor</th>
+      <th>Cantidad</th>
+      <th>P. Unit.</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in detalle %}
+      <tr>
+        <td>{{ d.producto }}</td>
+        <td>{{ d.sabor }}</td>
+        <td>{{ d.cantidad }}</td>
+        <td>{{ d.precio_unitario|floatformat:2 }}</td>
+        <td>{{ d.sub_total|floatformat:2 }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-muted">Sin detalle aún.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a class="btn btn-secondary" href="{% url 'pedidos_pendientes' %}">Volver</a>
+
+<hr class="my-4">
+
+<h4>Pagos</h4>
+<p class="mb-2">
+  Pagado: <strong>{{ total_pagado|floatformat:2 }} Bs.</strong>
+  {% if pedido.total and total_pagado >= pedido.total %}
+    <span class="badge text-bg-success ms-2">Pagado</span>
+  {% endif %}
+  <span class="ms-3">Saldo: <strong>{{ saldo_pendiente|floatformat:2 }} Bs.</strong></span>
+</p>
+
+{% if es_duenio and saldo_pendiente|default:0 > 0 %}
+  <div class="text-end my-3">
+    <a class="btn btn-success" href="{% url 'crear_checkout' pedido.id %}">
+      💳 Pagar con tarjeta (Stripe) — {{ saldo_pendiente|floatformat:2 }} Bs
+    </a>
+  </div>
+{% endif %}
+
+{% if request.user.is_staff or perms.accounts.add_pago %}
+  <a class="btn btn-outline-primary btn-sm mb-2" href="{% url 'pago_registrar' pedido.id %}">
+    + Registrar pago
+  </a>
+{% endif %}
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Fecha</th>
+      <th>Método</th>
+      <th>Monto (Bs.)</th>
+      <th>Referencia</th>
+      <th>Registrado por</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in pagos %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+        <td>{{ p.metodo }}</td>
+        <td>{{ p.monto|floatformat:2 }}</td>
+        <td>{{ p.referencia|default:"—" }}</td>
+        <td>{{ p.registrado_por.nombre|default:"—" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="text-muted">Sin pagos registrados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if pedido.total and total_pagado >= pedido.total %}
+  <a class="btn btn-success btn-sm mb-3" href="{% url 'factura_emitir' pedido.id %}">
+    Emitir factura
+  </a>
+  <a class="btn btn-outline-primary btn-sm" href="{% url 'envio_crear_editar' pedido.id %}">
+    Gestionar envío
+  </a>
+{% endif %}
+
+{% if request.user.is_staff %}
+  <a href="{% url 'aplicar_descuento_pedido' pedido.id %}" 
+     class="btn btn-sm btn-outline-primary mt-2">
+      💸 Aplicar descuento
+  </a>
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Promociones y Descuentos</h2>
+
+<a href="{% url 'descuento_nuevo' %}" class="btn btn-primary mb-3">
+  Nueva promoción
+</a>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Tipo</th>
+      <th>Valor</th>
+      <th>Activo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for d in descuentos %}
+    <tr>
+      <td>{{ d.nombre }}</td>
+      <td>{{ d.get_tipo_display }}</td>
+      <td>
+        {% if d.tipo == "PORCENTAJE" %}
+          {{ d.valor }} %
+        {% else %}
+          Bs. {{ d.valor }}
+        {% endif %}
+      </td>
+      <td>
+        {% if d.activo %}
+          <span class="badge bg-success">Activo</span>
+        {% else %}
+          <span class="badge bg-secondary">Inactivo</span>
+        {% endif %}
+      </td>
+      <td>
+        <a href="{% url 'descuento_editar' d.id %}" class="btn btn-sm btn-warning">Editar</a>
+        <a href="{% url 'descuento_toggle' d.id %}" class="btn btn-sm btn-outline-secondary">
+          {% if d.activo %}Desactivar{% else %}Activar{% endif %}
+        </a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">No hay descuentos registrados.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

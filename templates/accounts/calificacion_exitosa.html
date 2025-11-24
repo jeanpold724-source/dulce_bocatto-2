@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-4">
+  <h2>¡Gracias por tu calificación! ✅</h2>
+  <p>Tu puntaje y comentario se han guardado correctamente.</p>
+
+  <a href="{% url 'pedidos_confirmados' %}" class="btn btn-primary mt-3">
+    Volver a Mis pedidos
+  </a>
+</div>
+
+{% endblock %}

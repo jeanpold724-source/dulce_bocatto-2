@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>
+  {% if descuento %}Editar promoción{% else %}Nueva promoción{% endif %}
+</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-success">Guardar</button>
+  <a href="{% url 'descuentos_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
